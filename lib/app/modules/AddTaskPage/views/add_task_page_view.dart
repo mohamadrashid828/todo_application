@@ -1,7 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_application/app/cusstomWidgget/cusstomWidget.dart';
+import 'package:todo_application/app/data/databaseSQL.dart';
+import 'package:todo_application/app/modules/home/controllers/home_controller.dart';
 import 'package:todo_application/app/thems/themsCoustm.dart';
 
 import '../controllers/add_task_page_controller.dart';
@@ -14,15 +17,22 @@ class AddTaskPageView extends GetView<AddTaskPageController> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          actions: [CircleAvatar(
-            minRadius: 25,
-            child: CircleAvatar(
-              minRadius: 23,
-              child: Icon(Icons.person,color: context.theme.primaryColor,),backgroundColor: context.theme.scaffoldBackgroundColor,))],
-          centerTitle: true,
-          elevation: 0,
-          backgroundColor:context.theme.scaffoldBackgroundColor
-        ),
+            actions: [
+              CircleAvatar(
+                  minRadius: 25,
+                  child: CircleAvatar(
+                    minRadius: 23,
+                    child: Icon(
+                      Icons.person,
+                      color: context.theme.primaryColor,
+                    ),
+                    backgroundColor: context.theme.scaffoldBackgroundColor,
+                  ))
+            ],
+            centerTitle: true,
+            elevation: 0,
+            iconTheme: IconThemeData(color: context.theme.primaryColor),
+            backgroundColor: context.theme.scaffoldBackgroundColor),
         body: SingleChildScrollView(
           child: Center(
               child: Obx(() => Column(
@@ -49,7 +59,17 @@ class AddTaskPageView extends GetView<AddTaskPageController> {
                         Lable: "Date",
                         controller1: controller.Date.value,
                         widget: IconButton(
-                            onPressed: () {},
+                            onPressed: () async {
+                              final res = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2022),
+                                  lastDate: DateTime(2030));
+                              if (res != null) {
+                                controller.Date.value.text =
+                                    DateFormat.yMd().format(res).toString();
+                              }
+                            },
                             icon: const Icon(Icons.date_range_outlined)),
                       ),
                       Row(
@@ -60,7 +80,19 @@ class AddTaskPageView extends GetView<AddTaskPageController> {
                               Lable: "Start Date",
                               controller1: controller.StartTime.value,
                               widget: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    final res = await showTimePicker(
+                                        context: context,
+                                        initialTime: TimeOfDay.now());
+                                    if (res != null) {
+                                      controller.StartTime.value.text =
+                                          DateFormat("hh:mm a")
+                                              .format(DateTime(1, 1, 1,
+                                                  res.hour, res.minute))
+                                              .toString()
+                                              .toString();
+                                    }
+                                  },
                                   icon: const Icon(Icons.timer_outlined)),
                             ),
                           ),
@@ -70,7 +102,19 @@ class AddTaskPageView extends GetView<AddTaskPageController> {
                               Lable: "End Date",
                               controller1: controller.EndTime.value,
                               widget: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    final res = await showTimePicker(
+                                        context: context,
+                                        initialTime: TimeOfDay.now());
+                                    if (res != null) {
+                                      controller.EndTime.value.text =
+                                          DateFormat("hh:mm a")
+                                              .format(DateTime(1, 1, 1,
+                                                  res.hour, res.minute))
+                                              .toString()
+                                              .toString();
+                                    }
+                                  },
                                   icon: const Icon(Icons.timer_outlined)),
                             ),
                           ),
@@ -85,12 +129,12 @@ class AddTaskPageView extends GetView<AddTaskPageController> {
                               borderRadius: BorderRadius.circular(10),
                               dropdownColor: Colors.grey,
                               style: const TextStyle(color: Colors.white),
-                              items:
-                                  controller.Rimind.map<DropdownMenuItem<int>>(
-                                          (e) => DropdownMenuItem(
-                                              value: e,
-                                              child: Text("$e minute early")))
-                                      .toList(),
+                              items: List.generate(5, (e) => 5 * e + 3)
+                                  .map<DropdownMenuItem<int>>((e) =>
+                                      DropdownMenuItem(
+                                          value: e,
+                                          child: Text("$e minute early")))
+                                  .toList(),
                               onChanged: (value) {
                                 remind_value = value!;
                                 controller.Rimindtextcontroler.value.text =
@@ -128,41 +172,59 @@ class AddTaskPageView extends GetView<AddTaskPageController> {
                                 ),
                                 Row(
                                   children: [
-                                    ...controller.color.value
-                                        .map<Widget>((e) => Padding(
-                                              padding: const EdgeInsets.all(4.0),
-                                              child: InkWell(
-                                                onTap: () {
-                                                  controller.selectcolor.value = e;
-                                                },
-                                                child: CircleAvatar(
-                                                    backgroundColor: e,
-                                                    child: controller.selectcolor
-                                                                .value ==
-                                                            e
-                                                        ? const Icon(Icons.check)
-                                                        : null),
-                                              ),
-                                            )),
-                                  
+                                    ...controller.color.value.map<Widget>((e) =>
+                                        Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: InkWell(
+                                            onTap: () {
+                                              controller.selectcolor.value =
+                                                  colortoString(e);
+                                            },
+                                            child: CircleAvatar(
+                                                backgroundColor: e,
+                                                child: HomeController()
+                                                            .changenumbertocolor(
+                                                                controller
+                                                                    .selectcolor
+                                                                    .value) ==
+                                                        e
+                                                    ? const Icon(Icons.check)
+                                                    : null),
+                                          ),
+                                        )),
                                   ],
                                 ),
                               ],
                             ),
-                             CoustonmWidget().mybutton(
-                                context,
-                                    width: 100,
-                                    hight: 40,
-                                    function: (){},
-                                    text: const Text("Add task",
-                                        style: TextStyle(color: Colors.white)
-                                        )),
+                            CoustonmWidget().mybutton(context,
+                                width: 100, hight: 40, function: () {
+                              db_connection_and_oprator().Validationtextfild(
+                                  title: controller.Titel.value.text,
+                                  note: controller.Note.value.text,
+                                  task: controller.inputdataTo_Task(
+                                      rimind: remind_value));
+                            },
+                                text: const Text("Add task",
+                                    style: TextStyle(color: Colors.white))),
                           ],
                         ),
                       )
                     ],
                   ))),
         ));
+  }
+
+  String colortoString(MaterialColor e) {
+    switch (e) {
+      case Colors.red:
+        return "red";
+      case Colors.orange:
+        return "orange";
+      case Colors.green:
+        return "green";
+      default:
+        return "red";
+    }
   }
 }
 
@@ -191,7 +253,7 @@ class InputTextFormFild extends StatelessWidget {
           Container(
             height: 50,
             decoration: BoxDecoration(
-              border: Border.all(width: 1),
+              border: Border.all(width: 1, color: context.theme.primaryColor),
               borderRadius: BorderRadius.circular(15),
             ),
             child: Row(

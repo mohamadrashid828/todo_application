@@ -19,5 +19,4 @@ class NotificationScreenController extends GetxController {
     super.onClose();
   }
 
-  void increment() => count.value++;
 }

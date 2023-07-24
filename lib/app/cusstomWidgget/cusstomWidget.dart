@@ -12,17 +12,17 @@ class CoustonmWidget {
       Widget? text}) {
     return InkWell(
       onTap: () {
-        function;
+        function();
       },
       child: Container(
         width: width,
         height: hight,
         decoration: BoxDecoration(
-            color: color ?? ctx.theme.primaryColor,
+            color: color ?? ctx.theme.colorScheme.secondary,
             boxShadow: [
               const BoxShadow(blurRadius: 0.2, blurStyle: BlurStyle.outer)
             ],
-            borderRadius: BorderRadius.circular(15)),
+            borderRadius: BorderRadius.circular(10)),
         child: Row(
           mainAxisAlignment: icon == null || text == null
               ? MainAxisAlignment.center
